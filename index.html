@@ -161,7 +161,6 @@
   <button class="theme-toggle" id="themeToggle" title="Chọn nền">&#128247;</button>
   <div class="theme-panel" id="themePanel">
     <h3>Chọn nền ảnh/video</h3>
-    <p class="sub">Chọn một ảnh hoặc video có sẵn trong thư mục <code>img/</code>.</p>
     <div class="swatches" id="swatches"></div>
     <button class="theme-reset" id="themeReset">Về mặc định</button>
   </div>
@@ -690,7 +689,7 @@
   document.body.appendChild(bgLayer);
 
   const mediaOptions = [
-    { name:'Anh đỏ', src:'img/anh-do 1.jpg', type:'image' },
+    { name:'Anh đỏ', src:'img/anh-do 1.jpg', type:'image', pos:'bottom' },
     { name:'Artwork Gemini', src:'img/img1.png', type:'image' },
     { name:'img2', src:'img/img2.jpg', type:'image' },
     { name:'DIY gift', src:'img/vid1.mp4', type:'video' },
@@ -741,7 +740,7 @@
     label.textContent = opt.name;
     s.appendChild(label);
     s.addEventListener('click', ()=>{
-      applyMedia(opt.src, opt.type);
+      applyMedia(opt.src, opt.type, opt.pos);
       saveMedia(opt.src, opt.type);
     });
     swatchWrap.appendChild(s);
@@ -755,12 +754,13 @@
     highlightActive('');
   }
 
-  function applyMedia(src, type){
+  function applyMedia(src, type, pos){
     if(type === 'image'){
       bgVideo.style.display = 'none';
       bgVideo.pause();
       bgVideo.removeAttribute('src');
-      bgLayer.style.background = `linear-gradient(160deg, rgba(26,20,16,.7), rgba(43,31,23,.35)), url("${src}") center/cover no-repeat`;
+      const bgPos = pos || 'center';
+      bgLayer.style.background = `linear-gradient(160deg, rgba(26,20,16,.7), rgba(43,31,23,.35)), url("${src}") ${bgPos}/cover no-repeat`;
     } else {
       bgLayer.style.background = 'linear-gradient(160deg, rgba(26,20,16,.55), rgba(43,31,23,.3))';
       bgVideo.src = src;
@@ -791,10 +791,11 @@
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(MEDIA_KEY)); } catch(e){}
     if(saved && saved.src && saved.type) {
-      applyMedia(saved.src, saved.type);
+      const savedOpt = mediaOptions.find(o => o.src === saved.src);
+      applyMedia(saved.src, saved.type, savedOpt && savedOpt.pos);
     } else {
       const defaultMedia = mediaOptions[0];
-      applyMedia(defaultMedia.src, defaultMedia.type);
+      applyMedia(defaultMedia.src, defaultMedia.type, defaultMedia.pos);
     }
   })();
 
