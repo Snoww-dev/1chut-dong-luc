@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Câu nói truyền cảm hứng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0d1a2b; --bg2:#132238; --ink:#e8f0fb; --muted:#7fa8cc;
+    --accent:#4a9ede; --accent-soft:#82c4f8; --card:rgba(255,255,255,.04); --border:rgba(74,158,222,.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:"Be Vietnam Pro",sans-serif;
+    background:
+      radial-gradient(120% 80% at 20% 0%, #0a1e3a 0%, transparent 55%),
+      radial-gradient(100% 90% at 90% 100%, #0d2a4a 0%, transparent 50%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    color:var(--ink);min-height:100%;display:flex;align-items:center;justify-content:center;
+    padding:28px 20px;position:relative;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+  }
+  .stage{width:100%;max-width:600px;text-align:center;position:relative;z-index:2}
+  .eyebrow{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:26px;opacity:.85}
+  .quote-wrap{min-height:180px;display:flex;flex-direction:column;justify-content:center;margin-bottom:30px}
+  .quote-img{
+    max-width:100%;max-height:280px;border-radius:14px;margin:0 auto 18px;
+    display:none;object-fit:contain;
+    box-shadow:0 14px 40px -12px rgba(0,0,0,.55);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .quote-img.show{display:block;animation:imgIn .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes imgIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  .img-preview{
+    max-width:100%;max-height:140px;border-radius:10px;margin-top:6px;display:none;
+    border:1px solid var(--border);
+  }
+  .img-preview.show{display:block}
+  .file-hint{font-size:.72rem;color:var(--muted);margin-top:4px;opacity:.8}
+  .img-tabs{display:flex;gap:6px;margin-bottom:8px}
+  .img-tab{
+    flex:1;font-size:.78rem;padding:7px 10px;border-radius:8px;cursor:pointer;
+    background:transparent;border:1px solid var(--border);color:var(--muted);
+    font-family:inherit;transition:all .15s;
+  }
+  .img-tab.active{background:var(--card);color:var(--accent-soft);border-color:var(--accent)}
+  .clear-img{font-size:.72rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;margin-top:6px;padding:0}
+  .clear-img:hover{color:var(--accent-soft)}
+  .mark{font-family:"Fraunces",serif;font-size:5rem;line-height:.5;color:var(--accent);opacity:.25;margin-bottom:6px;height:34px}
+  .quote{font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.9rem,5.5vw,2.8rem);line-height:1.4;letter-spacing:-.01em;transition:opacity .45s ease, transform .45s ease}
+  .author{margin-top:18px;font-size:.9rem;color:var(--muted);font-style:italic;transition:opacity .45s ease, transform .45s ease}
+  .author.show::before{content:"— "}
+  .fade-out{opacity:0;transform:translateY(10px)}
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:"Be Vietnam Pro",sans-serif;font-weight:600;font-size:.95rem;color:#241a10;
+    background:linear-gradient(135deg,var(--accent-soft),var(--accent));padding:14px 30px;border-radius:999px;letter-spacing:.02em;
+    box-shadow:0 10px 30px -8px rgba(232,160,76,.55), inset 0 1px 0 rgba(255,255,255,.4);transition:transform .2s ease, box-shadow .2s ease, filter .2s ease}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .btn:active{transform:translateY(0) scale(.97)}
+  .btn .ico{display:inline-block;margin-right:8px;transition:transform .5s ease}
+  .btn:hover .ico{transform:rotate(180deg)}
+  .btn-ghost{background:transparent;color:var(--accent-soft);border:1px solid var(--border);box-shadow:none}
+  .btn-ghost:hover{background:var(--card);filter:none}
+  .count{margin-top:18px;font-size:.74rem;color:var(--muted);opacity:.7;letter-spacing:.05em}
+  .overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(10,7,4,.7);backdrop-filter:blur(4px)}
+  .overlay.open{display:flex}
+  .modal{width:100%;max-width:440px;text-align:left;background:linear-gradient(160deg,#241a12,#1c140e);border:1px solid var(--border);border-radius:20px;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);animation:pop .3s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes pop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal h2{font-family:"Fraunces",serif;font-weight:600;font-size:1.3rem;margin-bottom:4px}
+  .modal p.sub{font-size:.82rem;color:var(--muted);margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.78rem;color:var(--accent-soft);margin-bottom:6px;letter-spacing:.03em}
+  .field textarea,.field input[type=text],.field input:not([type]){width:100%;font-family:inherit;font-size:.95rem;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:12px;padding:12px 14px;resize:vertical;outline:none;transition:border-color .2s}
+  .field textarea:focus,.field input:focus{border-color:var(--accent)}
+  .field input[type=file]{width:100%;font-family:inherit;font-size:.85rem;color:var(--muted);padding:6px 0}
+  .field input[type=file]::file-selector-button{font-family:inherit;font-size:.78rem;color:var(--accent-soft);background:transparent;border:1px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer;margin-right:10px}
+  .field textarea{min-height:78px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+  .msg{font-size:.8rem;color:var(--accent);min-height:18px;margin-top:4px}
+  @keyframes intro{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .stage>*{animation:intro .7s cubic-bezier(.2,.7,.2,1) both}
+  .eyebrow{animation-delay:.05s}.quote-wrap{animation-delay:.18s}.actions{animation-delay:.32s}.count{animation-delay:.4s}
+
+  /* particles canvas */
+  #particles{position:fixed;inset:0;pointer-events:none;z-index:1}
+
+  /* cursor trail */
+  .trail-dot{position:fixed;pointer-events:none;z-index:999;width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0;transform:translate(-50%,-50%)}
+
+  /* ambient glow flash khi chuyển câu */
+  @keyframes glowPulse{0%{opacity:0}40%{opacity:1}100%{opacity:0}}
+  #ambientGlow{position:fixed;inset:0;pointer-events:none;z-index:3;
+    background:radial-gradient(ellipse 60% 40% at 50% 50%, rgba(74,158,222,.18), transparent 70%);
+    opacity:0}
+  #ambientGlow.flash{animation:glowPulse .9s ease both}
+
+  /* ripple trên nút */
+  .btn{position:relative;overflow:hidden}
+  .ripple{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.35);animation:rippleAnim .55s linear;pointer-events:none}
+  @keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+
+  /* typewriter cursor */
+  .quote::after{content:'|';display:inline-block;margin-left:2px;opacity:0;animation:blink 1s step-end infinite}
+  .quote.typing::after{opacity:1}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* nút rung nhẹ khi hover */
+  @keyframes wiggle{0%,100%{transform:translateY(-2px) rotate(0deg)}25%{transform:translateY(-2px) rotate(-1.5deg)}75%{transform:translateY(-2px) rotate(1.5deg)}}
+  .btn:not(.btn-ghost):hover{animation:wiggle .35s ease}
+
+  /* eyebrow shimmer */
+  @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+  .eyebrow{
+    background:linear-gradient(90deg, var(--accent) 0%, var(--accent-soft) 30%, #fff 50%, var(--accent-soft) 70%, var(--accent) 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    animation:intro .7s cubic-bezier(.2,.7,.2,1) both, shimmer 4s linear infinite;
+    animation-delay:.05s, 1.5s;
+  }
+
+  /* nút chỉnh màu */
+  .theme-toggle{
+    position:fixed;top:16px;right:16px;z-index:15;
+    width:42px;height:42px;border-radius:50%;cursor:pointer;border:1px solid var(--border);
+    background:var(--card);color:var(--accent-soft);font-size:1.1rem;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .2s ease, background .2s ease;backdrop-filter:blur(6px);
+  }
+  .theme-toggle:hover{transform:rotate(25deg) scale(1.08);background:rgba(255,255,255,.08)}
+  .theme-panel{
+    position:fixed;top:64px;right:16px;z-index:16;width:230px;
+    background:linear-gradient(160deg,rgba(40,30,22,.96),rgba(24,18,12,.97));
+    border:1px solid var(--border);border-radius:16px;padding:16px;
+    box-shadow:0 24px 60px -16px rgba(0,0,0,.7);backdrop-filter:blur(8px);
+    display:none;animation:pop .25s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .theme-panel.open{display:block}
+  .theme-panel h3{font-family:"Fraunces",serif;font-weight:600;font-size:.95rem;margin-bottom:10px;color:var(--ink)}
+  .swatches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+  .swatch{position:relative;cursor:pointer;border-radius:14px;border:2px solid transparent;overflow:hidden;min-height:90px;display:flex;align-items:flex-end;justify-content:center;padding:10px;text-align:center;color:#fff;font-size:.76rem;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(0,0,0,.35));background-size:cover;background-position:center}
+  .swatch:hover{transform:translateY(-2px)}
+  .swatch.video::before{content:'▶';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;opacity:.75}
+  .swatch.active{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+  .swatch span{position:relative;z-index:1;padding:.2rem .45rem;border-radius:10px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px)}
+  .theme-reset{width:100%;margin-top:6px;font-size:.74rem;color:var(--accent-soft);background:transparent;border:1px solid var(--border);border-radius:8px;padding:7px;cursor:pointer;transition:background .15s}
+  .theme-reset:hover{background:var(--card)}
+  #backgroundLayer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  #bgVideo{width:100%;height:100%;object-fit:cover;opacity:.35;pointer-events:none;display:none}
+</style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div id="ambientGlow"></div>
+  <button class="theme-toggle" id="themeToggle" title="Chọn nền">&#128247;</button>
+  <div class="theme-panel" id="themePanel">
+    <h3>Chọn nền ảnh/video</h3>
+    <p class="sub">Chọn một ảnh hoặc video có sẵn trong thư mục <code>img/</code>.</p>
+    <div class="swatches" id="swatches"></div>
+    <button class="theme-reset" id="themeReset">Về mặc định</button>
+  </div>
+
+  <main class="stage">
+    <div class="eyebrow">Thông điệp ngẫu nhiên dành cho bạn</div>
+    <div class="quote-wrap">
+      <img class="quote-img" id="quoteImg" alt="">
+      <div class="mark">&ldquo;</div>
+      <p class="quote" id="quote"></p>
+      <p class="author" id="author"></p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="btn"><span class="ico">&#10022;</span>Cho tôi một câu</button>
+      <button class="btn btn-ghost" id="addBtn">+ Thêm câu</button>
+    </div>
+    <div class="count" id="count"></div>
+  </main>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2>Thêm câu của bạn</h2>
+      <p class="sub">Câu mới sẽ được lưu vào cơ sở dữ liệu.</p>
+      <div class="field">
+        <label for="newText">Nội dung câu nói</label>
+        <textarea id="newText" placeholder="VD: Tôi đã tìm thấy lối thoát trong công việc: thoát vị đĩa đệm."></textarea>
+      </div>
+      <div class="field">
+        <label for="newAuthor">Tác giả (không bắt buộc)</label>
+        <input id="newAuthor" type="text" placeholder="1 nhà hiền triết trong Ethan Ecom">
+      </div>
+      <div class="field">
+        <label>Hình ảnh (không bắt buộc)</label>
+        <div class="img-tabs">
+          <button type="button" class="img-tab active" data-tab="url">Dán link ảnh</button>
+          <button type="button" class="img-tab" data-tab="file">Tải file</button>
+        </div>
+        <div id="tabUrl">
+          <input id="newImgUrl" type="text" placeholder="">
+        </div>
+        <div id="tabFile" style="display:none">
+          <input id="newImgFile" type="file" accept="image/*">
+          <div class="file-hint">Lưu trong trình duyệt, giới hạn ~5MB tổng.</div>
+        </div>
+        <img class="img-preview" id="imgPreview" alt="">
+        <button type="button" class="clear-img" id="clearImg" style="display:none">Xóa ảnh</button>
+      </div>
+      <div class="msg" id="msg"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="cancelBtn">Hủy</button>
+        <button class="btn" id="saveBtn">Lưu câu</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Đường dẫn tới API PHP — khi deploy đổi thành URL tuyệt đối, ví dụ: 'https://sub.domain.com/api.php'
+  const API_URL = 'api.php';
+
+  const baseQuotes = [
+    {t:"Cách tốt nhất để dự đoán tương lai là tự tay tạo ra nó.", a:"Peter Drucker"},
+    {t:"Hành trình ngàn dặm bắt đầu từ một bước chân.", a:"Lão Tử"},
+    {t:"Không bắt đầu thì chẳng bao giờ giỏi được.", a:"Zig Ziglar"},
+    {t:"Thất bại là cơ hội bắt đầu lại, lần này khôn hơn.", a:"Henry Ford"},
+    {t:"Hãy là sự thay đổi bạn muốn thấy.", a:"Gandhi"},
+    {t:"Khó khăn không kéo dài mãi, người kiên cường thì có.", a:"R. Schuller"},
+    {t:"Đừng đếm số ngày, hãy khiến mỗi ngày đáng giá.", a:"Muhammad Ali"},
+    {t:"Cơ hội không tự đến, bạn phải tạo ra nó.", a:"Chris Grosser"},
+    {t:"Người lạc quan thấy cơ hội trong mọi khó khăn.", a:"Churchill"},
+    {t:"Tin rằng mình làm được, thế là đã đi nửa đường.", a:"T. Roosevelt"},
+    {t:"Bí quyết để tiến lên là bắt đầu.", a:"Mark Twain"},
+    {t:"Đừng sợ đi chậm, chỉ sợ đứng yên.", a:"Tục ngữ"},
+    {t:"Bền bỉ chinh phục mọi thứ.", a:"Benjamin Franklin"},
+    {t:"Làm điều bình thường một cách phi thường.", a:"Khuyết danh"},
+    {t:"Giấc mơ không hết hạn, chỉ có người bỏ cuộc.", a:"Khuyết danh"},
+    {t:"Mỗi chuyên gia đều từng là người mới bắt đầu.", a:"Khuyết danh"},
+    {t:"Bạn không thua cho đến khi bạn ngừng cố gắng.", a:"Khuyết danh"},
+    {t:"Áp lực tạo ra kim cương.", a:"Khuyết danh"},
+    {t:"Gieo thói quen, gặt số phận.", a:"Khuyết danh"},
+    {t:"Việc khó làm hôm nay, mai sẽ thành chuyện nhỏ.", a:"Khuyết danh"},
+    {t:"Đừng chờ cảm hứng, hãy bắt tay rồi cảm hứng sẽ tới.", a:"Khuyết danh"},
+    {t:"Kỷ luật là cây cầu nối ước mơ và hiện thực.", a:"Jim Rohn"},
+    {t:"Bạn là trung bình của 5 người bạn dành thời gian nhiều nhất.", a:"Jim Rohn"},
+    {t:"Tốt hơn hôm qua, đó đã là chiến thắng.", a:"Khuyết danh"},
+    {t:"Không có gió ngược, diều chẳng thể bay cao.", a:"Khuyết danh"},
+    {t:"Cứ đi rồi sẽ đến.", a:"Lỗ Tấn"},
+    {t:"Thái độ quyết định độ cao.", a:"Khuyết danh"},
+    {t:"Ngã bảy lần, đứng dậy tám lần.", a:"Tục ngữ Nhật"},
+    {t:"Hôm nay khó, ngày mai khó hơn, nhưng ngày kia sẽ đẹp.", a:"Jack Ma"},
+    {t:"Đừng so mình với người khác, hãy so với chính mình hôm qua.", a:"Khuyết danh"},
+    {t:"Tôi không lười, tôi chỉ đang ở chế độ tiết kiệm pin.", a:"Khuyết danh"},
+    {t:"Deadline là nguồn cảm hứng sáng tạo lớn nhất nhân loại.", a:"Khuyết danh"},
+    {t:"Tôi đã giảm cân thành công… từ ví tiền.", a:"Khuyết danh"},
+    {t:"Cà phê: vì người lớn cũng cần siêu năng lực.", a:"Khuyết danh"},
+    {t:"Tôi không trì hoãn, tôi đang ủ ý tưởng cho chín.", a:"Khuyết danh"},
+    {t:"Ngủ là cách thiền sâu nhất mà tôi từng thử.", a:"Khuyết danh"},
+    {t:"Tài khoản ngân hàng của tôi cũng theo đuổi lối sống tối giản.", a:"Khuyết danh"},
+    {t:"Tôi đa nhiệm: vừa lo lắng, vừa chẳng làm gì.", a:"Khuyết danh"},
+    {t:"Đời cho tôi quả chanh, tôi đem… bán lại.", a:"Khuyết danh"},
+    {t:"Tập gym mệt, nên tôi tập kiên nhẫn ở nhà.", a:"Khuyết danh"},
+    {t:"Tôi nói được 3 thứ tiếng: tiếng mẹ đẻ, tiếng lóng và tiếng thở dài.", a:"Khuyết danh"},
+    {t:"Kế hoạch của tôi rất chắc: không có kế hoạch nào cả.", a:"Khuyết danh"},
+    {t:"Tôi không béo, chỉ là dễ thương theo chiều ngang.", a:"Khuyết danh"},
+    {t:"Đừng từ bỏ ước mơ, hãy tiếp tục ngủ.", a:"Khuyết danh"},
+    {t:"Tiền không mua được hạnh phúc, nhưng mua được trà sữa, gần như nhau.", a:"Khuyết danh"},
+    {t:"Tôi đến phòng gym để nó biết mặt, vậy là đủ.", a:"Khuyết danh"},
+    {t:"Năng suất của tôi tỉ lệ thuận với độ gần deadline.", a:"Khuyết danh"},
+    {t:"Tôi rất giỏi việc bắt đầu… việc bắt đầu.", a:"Khuyết danh"},
+    {t:"Đời là bể khổ, may là tôi biết bơi… kiểu chó.", a:"Khuyết danh"},
+    {t:"Tôi đã tìm thấy lối thoát trong công việc: thoát vị đĩa đệm.", a:"Khuyết danh"},
+    {t:"Người ta nói im lặng là vàng, nên tôi đang tích cóp làm giàu.", a:"Khuyết danh"},
+    {t:"Tôi không thất nghiệp, tôi đang là CEO của thời gian rảnh.", a:"Khuyết danh"},
+    {t:"Mỗi sáng tôi đều dậy sớm… để tắt báo thức rồi ngủ tiếp.", a:"Khuyết danh"},
+    {t:"Tôi ăn kiêng rất nghiêm túc: kiêng… ăn ít.", a:"Khuyết danh"},
+    {t:"Học, học nữa, học mãi — và tôi vẫn chưa học xong cách dậy sớm.", a:"Khuyết danh"},
+    {t:"Sống là phải cho đi, nên tôi cho qua hết deadline.", a:"Khuyết danh"},
+    {t:"Tôi không stress, tôi chỉ đang vận động nội tâm cường độ cao.", a:"Khuyết danh"},
+    {t:"Có công mài sắt, có ngày… chai tay.", a:"Khuyết danh"},
+    {t:"Wifi yếu mới biết ai là bạn thật.", a:"Khuyết danh"},
+    {t:"Tôi và đồng tiền: hợp nhau lắm, gặp là chia tay.", a:"Khuyết danh"},
+    {t:"Đi một ngày đàng, học một sàng… mỏi chân.", a:"Khuyết danh"},
+    {t:"Tôi quyết tâm thay đổi, bắt đầu từ ngày mai. Mai nào cũng được.", a:"Khuyết danh"},
+    {t:"Thức khuya có hại, nên tôi thức tới sáng cho an toàn.", a:"Khuyết danh"},
+    {t:"Tôi không nghiện mua sắm, tôi đang ủng hộ nền kinh tế.", a:"Khuyết danh"},
+    {t:"Bí quyết hạnh phúc: kỳ vọng thấp, wifi mạnh.", a:"Khuyết danh"},
+    {t:"Một việc nhỏ hoàn thành hơn trăm việc lớn dang dở.", a:"Khuyết danh"},
+    {t:"Bắt đầu từ nơi bạn đang đứng.", a:"Arthur Ashe"},
+    {t:"Đừng đợi thời cơ hoàn hảo, hãy làm cho thời điểm trở nên hoàn hảo.", a:"Khuyết danh"},
+    {t:"Sợ hãi chỉ là cảm xúc, không phải lời tiên tri.", a:"Khuyết danh"},
+    {t:"Hãy mơ lớn, bắt đầu nhỏ, hành động ngay.", a:"Robin Sharma"},
+    {t:"Thành công đến với người bận rộn tìm kiếm nó.", a:"Khuyết danh"},
+    {t:"Năng lực sinh ra từ giới hạn được vượt qua.", a:"Khuyết danh"},
+    {t:"Đừng để hôm qua chiếm chỗ của hôm nay.", a:"Khuyết danh"},
+    {t:"Kết quả là phần thưởng cho sự kiên trì.", a:"Khuyết danh"},
+    {t:"Mọi đỉnh núi đều có lối lên.", a:"Khuyết danh"},
+    {t:"Hãy làm, hoặc không làm. Đừng cố thử.", a:"Yoda"},
+    {t:"Chậm mà chắc vẫn thắng cuộc đua.", a:"Aesop"},
+    {t:"Càng đổ mồ hôi lúc tập, càng ít đổ máu lúc thi.", a:"Khuyết danh"},
+    {t:"Cây cối lớn lên trong im lặng.", a:"Khuyết danh"},
+    {t:"Mỗi 'không' đưa bạn gần hơn một 'có'.", a:"Khuyết danh"},
+    {t:"Việc đáng làm thì đáng làm dở lúc đầu.", a:"G.K. Chesterton"},
+    {t:"Sự chuẩn bị là một nửa của chiến thắng.", a:"Cervantes"},
+    {t:"Người mạnh không phải không ngã, mà là biết đứng lên.", a:"Khuyết danh"},
+    {t:"Hãy gieo điều tử tế, rồi gặt sự bình yên.", a:"Khuyết danh"},
+    {t:"Cuộc đời 10% là điều xảy ra, 90% là cách bạn phản ứng.", a:"Charles Swindoll"},
+    {t:"Không ai có thể khiến bạn thấy thấp kém nếu bạn không cho phép.", a:"E. Roosevelt"},
+    {t:"Hành động là liều thuốc giải cho nỗi sợ.", a:"Khuyết danh"},
+    {t:"Tập trung vào tiến bộ, không phải sự hoàn hảo.", a:"Khuyết danh"},
+    {t:"Ý tưởng không đáng giá gì nếu không thực thi.", a:"Khuyết danh"},
+    {t:"Kiên nhẫn là sức mạnh thầm lặng.", a:"Khuyết danh"},
+    {t:"Mỗi ngày là một trang trắng, hãy viết đẹp.", a:"Khuyết danh"},
+    {t:"Làm điều đúng, kể cả khi không ai nhìn.", a:"Khuyết danh"},
+    {t:"Đừng sợ đối thủ giỏi, hãy sợ chính mình lười.", a:"Khuyết danh"},
+    {t:"Sóng to mới biết tay chèo cứng.", a:"Tục ngữ"},
+    {t:"Học từ hôm qua, sống cho hôm nay, hy vọng cho ngày mai.", a:"Einstein"},
+    {t:"Đừng để tiếng ồn của ý kiến người khác át đi tiếng lòng bạn.", a:"Steve Jobs"},
+    {t:"Chất lượng không phải hành động, mà là thói quen.", a:"Aristotle"},
+    {t:"Khởi đầu chậm không quyết định đích đến.", a:"Khuyết danh"},
+    {t:"Năng lượng đi đâu, kết quả theo đó.", a:"Khuyết danh"},
+    {t:"Tử tế là ngôn ngữ ai cũng hiểu.", a:"Khuyết danh"},
+    {t:"Một bước nhỏ mỗi ngày tạo nên hành trình lớn.", a:"Khuyết danh"},
+    {t:"Đừng so sánh chương 1 của bạn với chương 20 của người khác.", a:"Khuyết danh"},
+    {t:"Bạn không cần thấy hết cầu thang, chỉ cần bước bậc đầu tiên.", a:"M.L. King"},
+    {t:"Thành công là đi từ thất bại này đến thất bại khác mà không mất nhiệt huyết.", a:"Churchill"},
+    {t:"Cuộc đời là bể khổ, qua hết bể khổ là đến bể khác!", a:"Khuyết danh"},
+    {t:"Người ta nói mình béo, nhưng mình thấy đơn giản là mình đang tích trữ năng lượng cho tương lai thôi!", a:"Khuyết danh"},
+    {t:"Bạn muốn người yêu ngồi đối diện hay ngồi cạnh? Tôi thích họ ngồi xung quanh.", a:"Khuyết danh"},
+    {t:"Cách để không bị lợi dụng đó là trở nên vô dụng.", a:"Khuyết danh"},
+    {t:"Đi tu chưa chắc thành chín quả, nhưng chơi ngu thì sẽ nhận hậu quả.", a:"Khuyết danh"},
+    {t:"Tôi của những ngày gần đây: Độc lập, tự do, ăn no, đi ngủ.", a:"Khuyết danh"},
+    {t:"Ở cái tuổi đáng ra phải đau khổ vì tình, thì tôi lại đau lưng.", a:"Khuyết danh"},
+    {t:"Hôm nay gió lớn quá, vốn dĩ muốn đến phòng gym, gió lại thổi mình đến quán trà sữa.", a:"Khuyết danh"},
+    {t:"Anh đâu phải người nhện, sao cứ thích bôi tơ.", a:"Khuyết danh"},
+    {t:"Có những thứ mất rồi mới thấy, mất cũng được.", a:"Khuyết danh"},
+    {t:"Đóng cửa trái tim. Đẹp trai thì mở.", a:"Khuyết danh"},
+    {t:"Đã cố gắng đến công ty, nhưng trí óc lại quyết định ở nhà!", a:"Khuyết danh"},
+    {t:"Khách hàng là thượng đế, nên tự nhủ: phải tinh tế, không được đánh khách hàng.", a:"Khuyết danh"},
+    {t:"Đầu lòng hai ả tố nga. Thúy Kiều là chị, mai là thứ hai.", a:"Khuyết danh"},
+    {t:"Deadline không dí tôi, tôi dí deadline.", a:"Khuyết danh"},
+    {t:"Kẻ tổn thương nhất vẫn là kẻ phải chạy deadline tối thứ 7.", a:"Khuyết danh"},
+    {t:"Nếu người khác làm được thì mình nhờ họ làm luôn.", a:"Khuyết danh"},
+    {t:"Đã có chồng, chồng chất deadline.", a:"Khuyết danh"},
+    {t:"Một điều nhịn là 9 đứa ngồi lên đầu.", a:"Khuyết danh"},
+    {t:"Bằng mặt nhưng không bằng lái.", a:"Khuyết danh"},
+    {t:"Ở đời đừng khinh thường người khác. Hôm nay tôi chưa có tiền, chắc gì ngày mai tôi đã có.", a:"Khuyết danh"},
+    {t:"Bi kịch của đời người chính là: đam mê ẩm thực nhưng lại tích cực giảm cân.", a:"Khuyết danh"},
+    {t:"Đi bộ còn té lên té xuống mà đòi đi cùng nhau cả đời.", a:"Khuyết danh"},
+    {t:"Sống hướng nội nhưng hội nào cũng không thiếu mặt.", a:"Khuyết danh"},
+    {t:"Học đi đôi với hành. Hành đi đôi với tỏi.", a:"Khuyết danh"},
+    {t:"The sun will rise and we will try again.", a:"Khuyết danh"},
+    {t:"Sunsets are proof that endings can be beautiful too.", a:"Khuyết danh"},
+    {t:"Live for you, not for anyone.", a:"Khuyết danh"},
+    {t:"Trong các loại buồn chỉ có buồn cười là vui nhất.", a:"Khuyết danh"},
+    {t:"Giao diện trưởng thành. Nhưng hệ điều hành nhõng nhẽo.", a:"Khuyết danh"},
+    {t:"Có một thứ tiền không mua được. Đó chính là sự nghèo khó!", a:"Khuyết danh"},
+    {t:"Béo không phải tội mà là vượt trội về thể xác.", a:"Khuyết danh"},
+    {t:"Trên đường đời tấp nập, ta vô tình nhặt phải xấp đô la?", a:"Khuyết danh"},
+    {t:"Hãy tự đi lên bằng chính đôi chân của mình… nếu thang máy hỏng.", a:"Khuyết danh"},
+    {t:"Cuộc sống vốn ngắn ngủi. Thế nên bạn hãy cười khi còn đủ răng.", a:"Khuyết danh"},
+    {t:"Không phải vì ế mà chưa có người yêu, chẳng qua là em chưa 'come out' giới tính thật của mình haha.", a:"Khuyết danh"},
+    {t:"Đi một ngày đàng… rớt mất 200.000.", a:"Khuyết danh"},
+    {t:"Hey Siri, tua về chủ nhật.", a:"Khuyết danh"},
+    {t:"Em dành thời gian cho em đi em! Ra ngoài đường kết bạn làm điều gì đó ý nghĩa đi em.", a:"Khuyết danh"},
+    {t:"Bóc trúng sít rịt.", a:"Khuyết danh"},
+    {t:"Mười điểm không có nhưng.", a:"Khuyết danh"},
+    {t:"Gwenchana.", a:"Khuyết danh"},
+    {t:"Còn thở là còn gỡ.", a:"Khuyết danh"},
+
+    // 100 câu bổ sung
+    {t:"Cuộc đời không phải là chờ đợi cơn bão qua đi, mà là học cách khiêu vũ dưới mưa.", a:"Vivian Greene"},
+    {t:"Bạn không thể đi ngược chiều gió, nhưng bạn có thể điều chỉnh cánh buồm.", a:"Jimmy Dean"},
+    {t:"Thành công không phải là chìa khóa của hạnh phúc. Hạnh phúc mới là chìa khóa của thành công.", a:"Albert Schweitzer"},
+    {t:"Hãy là sự thay đổi mà bạn muốn thấy trên thế giới.", a:"Mahatma Gandhi"},
+    {t:"Trong lúc khó khăn nhất, hãy nhớ rằng bầu trời sau mưa bao giờ cũng trong hơn.", a:"Khuyết danh"},
+    {t:"Điều duy nhất ngăn bạn đạt được ước mơ là nỗi sợ rằng bạn sẽ thất bại.", a:"Paulo Coelho"},
+    {t:"Đừng đếm những ngày, hãy làm cho những ngày đó đáng để đếm.", a:"Muhammad Ali"},
+    {t:"Sự kiên nhẫn là đắng, nhưng quả của nó rất ngọt.", a:"Aristotle"},
+    {t:"Cuộc hành trình ngàn dặm bắt đầu từ một bước chân.", a:"Lão Tử"},
+    {t:"Không ai có thể làm bạn cảm thấy thấp kém nếu bạn không cho phép họ.", a:"Eleanor Roosevelt"},
+    {t:"Điều tốt nhất bạn có thể làm là đúng. Điều tốt thứ nhì là sai. Điều tệ nhất là không làm gì cả.", a:"Theodore Roosevelt"},
+    {t:"Hạnh phúc không phải là đích đến, mà là cách bạn đi trên đường.", a:"Roy M. Goodman"},
+    {t:"Bạn chỉ sống một lần, nhưng nếu sống đúng cách, một lần là đủ.", a:"Mae West"},
+    {t:"Kẻ thất bại không phải là người ngã, mà là người từ chối đứng dậy.", a:"Mary Pickford"},
+    {t:"Đừng nói mình không có thời gian. Bạn có đúng 24 giờ như Beethoven, Michelangelo, và Leonardo da Vinci.", a:"H. Jackson Brown Jr."},
+    {t:"Tương lai thuộc về những ai tin vào vẻ đẹp của ước mơ.", a:"Eleanor Roosevelt"},
+    {t:"Thành công là tổng hợp của những nỗ lực nhỏ được lặp đi lặp lại ngày này qua ngày khác.", a:"Robert Collier"},
+    {t:"Hãy sống như thể hôm nay là ngày cuối cùng của bạn. Hãy học như thể bạn sẽ sống mãi mãi.", a:"Mahatma Gandhi"},
+    {t:"Sự vĩ đại không phải từ trên trời rơi xuống, mà được rèn giũa qua gian khó.", a:"Khuyết danh"},
+    {t:"Đừng chờ đến khi hoàn hảo mới bắt đầu. Bắt đầu và dần trở nên hoàn hảo.", a:"Khuyết danh"},
+    {t:"Người thông minh nhất trong phòng là người biết rằng mình vẫn còn nhiều thứ cần học.", a:"Khuyết danh"},
+    {t:"Mỗi chuyên gia từng là người mới bắt đầu.", a:"Helen Hayes"},
+    {t:"Chỉ có hai ngày trong năm không thể làm được gì: hôm qua và ngày mai.", a:"Đức Đạt Lai Lạt Ma"},
+    {t:"Bạn không cần phải vĩ đại để bắt đầu, nhưng bạn phải bắt đầu để trở nên vĩ đại.", a:"Zig Ziglar"},
+    {t:"Sai lầm lớn nhất bạn có thể mắc là sợ mắc sai lầm.", a:"Elbert Hubbard"},
+    {t:"Khi mọi thứ có vẻ đi ngược lại bạn, hãy nhớ rằng máy bay cất cánh ngược chiều gió, không phải xuôi chiều.", a:"Henry Ford"},
+    {t:"Nếu bạn không xây dựng ước mơ của mình, ai đó sẽ thuê bạn xây dựng ước mơ của họ.", a:"Tony Gaskins"},
+    {t:"Thời gian không chờ ai, hãy dùng nó trước khi nó dùng bạn.", a:"Khuyết danh"},
+    {t:"Khó khăn chuẩn bị những người bình thường cho số phận phi thường.", a:"C.S. Lewis"},
+    {t:"Đời không cho bạn những gì bạn muốn, mà cho bạn những gì bạn cần để trưởng thành.", a:"Khuyết danh"},
+    {t:"Hãy yêu bản thân đủ để đặt ra ranh giới. Thời gian và năng lượng của bạn là quý giá.", a:"Anna Taylor"},
+    {t:"Mưa không rơi mãi. Đêm không dài mãi. Khó khăn rồi cũng qua.", a:"Khuyết danh"},
+    {t:"Người mạnh không phải là người không bao giờ khóc, mà là người khóc xong rồi đứng dậy tiếp tục.", a:"Khuyết danh"},
+    {t:"Đừng so sánh chương một của bạn với chương hai mươi của người khác.", a:"Khuyết danh"},
+    {t:"Sự khác biệt giữa người thành công và người không thành công không phải là sức mạnh hay kiến thức, mà là ý chí.", a:"Vince Lombardi"},
+    {t:"Nếu bạn muốn tỏa sáng như mặt trời, trước tiên hãy cháy như mặt trời.", a:"A.P.J. Abdul Kalam"},
+    {t:"Không có thất bại nào là cuối cùng, cũng không có thành công nào là mãi mãi. Điều quan trọng là dũng khí để tiếp tục.", a:"Winston Churchill"},
+    {t:"Điều bạn nghĩ về bản thân quan trọng hơn nhiều so với điều người khác nghĩ về bạn.", a:"Seneca"},
+    {t:"Hành động là nền tảng của mọi thành công.", a:"Pablo Picasso"},
+    {t:"Cuộc đời cho bạn hai lựa chọn: chấp nhận những điều kiện tồn tại, hoặc chịu trách nhiệm thay đổi chúng.", a:"Denis Waitley"},
+    {t:"Đừng để ngày mai nhận những gì bạn có thể làm hôm nay.", a:"Benjamin Franklin"},
+    {t:"Sự tự tin không đến từ việc luôn đúng, mà từ việc không sợ sai.", a:"Rosalind Russell"},
+    {t:"Học từ ngày hôm qua, sống cho hôm nay, hi vọng vào ngày mai.", a:"Albert Einstein"},
+    {t:"Bạo lực duy nhất xứng đáng sử dụng là bạo lực dùng để tự vệ cho người yếu hơn.", a:"Mahatma Gandhi"},
+    {t:"Thay đổi không phải lúc nào cũng dễ dàng, nhưng nó luôn xứng đáng.", a:"Khuyết danh"},
+    {t:"Bạn không thể kiểm soát mọi thứ xảy ra với bạn, nhưng bạn có thể kiểm soát cách phản ứng.", a:"Khuyết danh"},
+    {t:"Sức mạnh không đến từ cơ thể, mà từ ý chí không khuất phục.", a:"Mahatma Gandhi"},
+    {t:"Mọi thứ bạn từng muốn đều nằm ở phía bên kia của nỗi sợ hãi.", a:"George Addair"},
+    {t:"Nơi tối nhất luôn là ngay trước bình minh.", a:"Thomas Fuller"},
+    {t:"Hãy tử tế với mọi người bạn gặp, vì mỗi người đều đang chiến đấu với một trận chiến mà bạn không biết.", a:"Plato"},
+    {t:"Điều tốt nhất về tương lai là nó đến từng ngày một.", a:"Abraham Lincoln"},
+    {t:"Khi bạn không thể quay lại, bạn chỉ còn cách tiến về phía trước.", a:"Paulo Coelho"},
+    {t:"Hãy làm điều tốt hôm nay, ngay cả khi bạn không được nhớ đến vào ngày mai.", a:"Mẹ Teresa"},
+    {t:"Cuộc sống là 10% những gì xảy ra với bạn và 90% cách bạn phản ứng.", a:"Charles R. Swindoll"},
+    {t:"Không có ước mơ nào quá lớn, không có mơ ước nào quá nhỏ.", a:"Khuyết danh"},
+    {t:"Người thành công không sợ mất đi những gì họ có, họ tập trung vào những gì họ có thể đạt được.", a:"Khuyết danh"},
+    {t:"Thử thách là những gì làm cuộc sống thú vị; vượt qua chúng là điều làm cuộc sống có ý nghĩa.", a:"Joshua J. Marine"},
+    {t:"Nếu bạn muốn hạnh phúc, hãy gắn nó với mục tiêu, không phải con người hay vật chất.", a:"Albert Einstein"},
+    {t:"Đừng nhìn đồng hồ — hãy làm những gì nó làm. Cứ tiếp tục.", a:"Sam Levenson"},
+    {t:"Chúng ta là những gì chúng ta liên tục làm. Vì vậy sự xuất sắc không phải là hành động, mà là thói quen.", a:"Aristotle"},
+    {t:"Điều tệ nhất xảy ra không phải là thất bại, mà là khi bạn không cố gắng.", a:"Khuyết danh"},
+    {t:"Hãy sống theo giá trị của bạn, không phải theo kỳ vọng của người khác.", a:"Khuyết danh"},
+    {t:"Bạn đủ mạnh hơn những gì bạn nghĩ, thông minh hơn những gì bạn tin, và có khả năng hơn những gì bạn tưởng.", a:"Khuyết danh"},
+    {t:"Mỗi buổi sáng là một cơ hội mới để bắt đầu lại.", a:"Khuyết danh"},
+    {t:"Niềm tin không làm cho mọi thứ dễ dàng, nhưng nó làm cho chúng trở nên có thể.", a:"Khuyết danh"},
+    {t:"Khi bạn cảm thấy muốn bỏ cuộc, hãy nhớ lý do tại sao bạn bắt đầu.", a:"Khuyết danh"},
+    {t:"Hạnh phúc thực sự đến khi bạn nhận ra bạn đã có đủ.", a:"Khuyết danh"},
+    {t:"Đừng chờ cảm hứng. Hãy hành động và cảm hứng sẽ đến sau.", a:"Jack London"},
+    {t:"Tất cả những giấc mơ có thể trở thành sự thật, nếu chúng ta có dũng khí theo đuổi chúng.", a:"Walt Disney"},
+    {t:"Bạn không thể trở lại và thay đổi điểm khởi đầu, nhưng bạn có thể bắt đầu nơi bạn đang đứng và thay đổi điểm kết thúc.", a:"C.S. Lewis"},
+    {t:"Mỗi ngày là một món quà. Đó là lý do người ta gọi nó là hiện tại.", a:"Khuyết danh"},
+    {t:"Hãy ngừng lo lắng về những gì người khác nghĩ. Hãy lo lắng về những gì bạn nghĩ về chính mình.", a:"Khuyết danh"},
+    {t:"Đôi khi bạn cần bước ra khỏi không gian mà bạn đang đứng và nhìn lại từ một góc độ khác.", a:"Khuyết danh"},
+    {t:"Chỉ khi đêm xuống, bạn mới thấy được những ngôi sao.", a:"Martin Luther King Jr."},
+    {t:"Lòng dũng cảm không phải là không có nỗi sợ, mà là nhận ra có điều gì đó quan trọng hơn nỗi sợ.", a:"Ambrose Redmoon"},
+    {t:"Yêu thương bản thân không phải là ích kỷ — đó là điều kiện tiên quyết để yêu thương người khác.", a:"Khuyết danh"},
+    {t:"Sự thất bại chỉ là cơ hội để bắt đầu lại, lần này thông minh hơn.", a:"Henry Ford"},
+    {t:"Bạn không thể kéo dài ngày, nhưng bạn có thể dùng nó sâu sắc hơn.", a:"Khuyết danh"},
+    {t:"Đời ngắn lắm — đừng dành nó để sống theo cuộc đời của người khác.", a:"Steve Jobs"},
+    {t:"Hãy tử tế hơn mức cần thiết, vì mọi người bạn gặp đều đang chiến đấu với điều gì đó.", a:"Khuyết danh"},
+    {t:"Thành công không đến với ai chờ đợi nó.", a:"Jawaharlal Nehru"},
+    {t:"Bạn không thể sử dụng thời gian đã qua, nhưng bạn hoàn toàn có thể làm chủ thời gian phía trước.", a:"Khuyết danh"},
+    {t:"Một ước mơ mà bạn không hành động để thực hiện chỉ là một giấc ngủ.", a:"Edwin Louis Cole"},
+    {t:"Không phải những gì xảy ra với bạn định nghĩa bạn, mà là cách bạn đứng dậy sau đó.", a:"Khuyết danh"},
+    {t:"Hãy chọn một công việc bạn yêu thích, và bạn sẽ không phải làm việc một ngày nào trong cuộc đời.", a:"Khổng Tử"},
+    {t:"Điều bạn tập trung vào sẽ phát triển.", a:"Khuyết danh"},
+    {t:"Đừng chờ ai cứu bạn. Hãy cứu chính mình trước.", a:"Khuyết danh"},
+    {t:"Cánh cửa hạnh phúc không bao giờ đóng hoàn toàn; nếu một cánh đóng, hãy tìm cánh khác đang mở.", a:"Helen Keller"},
+    {t:"Ngay cả khi bạn đi chậm, bạn vẫn đang đi xa hơn người đứng yên.", a:"Khuyết danh"},
+    {t:"Kết quả tốt đẹp không bao giờ đến từ vùng an toàn.", a:"Ben Carson"},
+    {t:"Bạn cần tin vào điều gì đó: trực giác, số phận, cuộc đời, nghiệp lực — bất cứ điều gì. Cách tiếp cận này chưa bao giờ khiến tôi thất vọng.", a:"Steve Jobs"},
+    {t:"Mỗi ngày bạn tỉnh dậy với một sức mạnh mới và một lý do mới để cảm ơn.", a:"Khuyết danh"},
+    {t:"Đừng bao giờ nhìn xuống ai ngoại trừ khi bạn đang giơ tay giúp họ đứng dậy.", a:"Jesse Jackson"},
+    {t:"Cuộc đời giống như đạp xe đạp. Để giữ thăng bằng, bạn phải tiếp tục di chuyển.", a:"Albert Einstein"},
+    {t:"Dù đêm tối thế nào, bình minh sẽ luôn đến.", a:"Victor Hugo"},
+    {t:"Hãy là ngọn nến thắp sáng bóng tối, không phải gương phản chiếu nỗi buồn.", a:"Khuyết danh"},
+    {t:"Thời gian duy nhất bạn không thể tìm lại được chính là thời gian đã qua.", a:"Khuyết danh"},
+    {t:"Nếu bạn biết mình muốn đi đâu, cả thế giới sẽ nhường đường cho bạn.", a:"Ralph Waldo Emerson"},
+    {t:"Giới hạn duy nhất trong cuộc đời bạn là những giới hạn bạn tự đặt ra cho mình.", a:"Les Brown"}
+  ];
+
+  let serverQuotes = []; // câu tải từ API
+  let usingAPI = false;
+  function allQuotes(){ return usingAPI ? serverQuotes : baseQuotes; }
+
+  const quoteEl = document.getElementById('quote');
+  const authorEl = document.getElementById('author');
+  const countEl  = document.getElementById('count');
+  const quoteImg = document.getElementById('quoteImg');
+  const btn = document.getElementById('btn');
+  let last = -1;
+
+  function updateCount(){ countEl.textContent = ""; }
+
+  // Tải câu từ API, fallback về baseQuotes nếu lỗi
+  async function loadQuotesFromAPI(){
+    try {
+      const res = await fetch(API_URL);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if(Array.isArray(data) && data.length > 0){
+        serverQuotes = data.map(r => ({ t: r.content, a: r.author, img: r.img_url || '' }));
+        usingAPI = true;
+      }
+    } catch(e){
+      // Server chưa có hoặc chạy local file:// — dùng baseQuotes
+    }
+    pickDaily();
+  }
+
+  function show(t, a, img){
+    quoteEl.classList.add('fade-out'); authorEl.classList.add('fade-out');
+    quoteImg.classList.remove('show');
+    setTimeout(()=>{
+      quoteEl.textContent = t; authorEl.textContent = a || "Khuyết danh"; authorEl.classList.add('show');
+      quoteEl.classList.remove('fade-out'); authorEl.classList.remove('fade-out');
+      if(img){
+        quoteImg.src = img;
+        quoteImg.classList.add('show');
+      } else {
+        quoteImg.src = "";
+      }
+    },300);
+  }
+  const DAILY_KEY = 'inspire_daily_v1';
+
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+  // Hàm hash đơn giản để chuyển chuỗi ngày → số nguyên dương
+  function hashDay(str){
+    let h = 0;
+    for(let i=0;i<str.length;i++) h = (Math.imul(31,h) + str.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+
+  function pickDaily(){
+    const list = allQuotes();
+    const today = todayStr();
+    const saved = JSON.parse(localStorage.getItem(DAILY_KEY) || 'null');
+    // Nếu đã có câu hôm nay, hiện lại câu đó
+    if(saved && saved.date === today){
+      last = saved.idx;
+      show(list[saved.idx % list.length].t, list[saved.idx % list.length].a, list[saved.idx % list.length].img);
+      return;
+    }
+    // Chọn câu mới dựa theo ngày, đảm bảo không trùng hôm qua
+    const prevIdx = saved ? saved.idx : -1;
+    let i = hashDay(today) % list.length;
+    if(i === prevIdx && list.length > 1) i = (i + 1) % list.length;
+    last = i;
+    localStorage.setItem(DAILY_KEY, JSON.stringify({ date: today, idx: i }));
+    show(list[i].t, list[i].a, list[i].img);
+  }
+
+  function pick(){
+    const list = allQuotes(); let i;
+    do { i = Math.floor(Math.random()*list.length); } while(i===last && list.length>1);
+    last = i; show(list[i].t, list[i].a, list[i].img);
+  }
+  btn.addEventListener('click', pick);
+
+  const overlay = document.getElementById('overlay');
+  const addBtn = document.getElementById('addBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const newText = document.getElementById('newText');
+  const newAuthor = document.getElementById('newAuthor');
+  const newImgUrl = document.getElementById('newImgUrl');
+  const newImgFile = document.getElementById('newImgFile');
+  const imgPreview = document.getElementById('imgPreview');
+  const clearImgBtn = document.getElementById('clearImg');
+  const msg = document.getElementById('msg');
+  let pendingImg = ""; // base64 hoặc URL
+
+  // chuyển tab dán link / tải file
+  document.querySelectorAll('.img-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.img-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      const which = tab.dataset.tab;
+      document.getElementById('tabUrl').style.display  = which==='url' ? '' : 'none';
+      document.getElementById('tabFile').style.display = which==='file' ? '' : 'none';
+    });
+  });
+
+  function setPreview(src){
+    if(src){
+      imgPreview.src = src; imgPreview.classList.add('show');
+      clearImgBtn.style.display = 'inline-block';
+      pendingImg = src;
+    } else {
+      imgPreview.src = ""; imgPreview.classList.remove('show');
+      clearImgBtn.style.display = 'none';
+      pendingImg = "";
+    }
+  }
+
+  newImgUrl.addEventListener('input', ()=>{
+    const v = newImgUrl.value.trim();
+    if(v) setPreview(v); else setPreview("");
+  });
+
+  newImgFile.addEventListener('change', ()=>{
+    const f = newImgFile.files[0];
+    if(!f) return;
+    if(f.size > 2*1024*1024){
+      msg.textContent = "Ảnh > 2MB có thể không lưu được. Nên dùng ảnh nhỏ hoặc dán link.";
+    }
+    const reader = new FileReader();
+    reader.onload = e => setPreview(e.target.result);
+    reader.readAsDataURL(f);
+  });
+
+  clearImgBtn.addEventListener('click', ()=>{
+    setPreview("");
+    newImgUrl.value = ""; newImgFile.value = "";
+  });
+
+  function openModal(){ overlay.classList.add('open'); msg.textContent=""; newText.focus(); }
+  function closeModal(){
+    overlay.classList.remove('open');
+    newText.value=""; newAuthor.value=""; newImgUrl.value=""; newImgFile.value="";
+    setPreview("");
+  }
+  addBtn.addEventListener('click', openModal);
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+
+  saveBtn.addEventListener('click', async ()=>{
+    const t = newText.value.trim();
+    const a = newAuthor.value.trim() || "Khuyết danh";
+    if(t.length < 3){ msg.textContent = "Câu hơi ngắn, viết thêm chút nhé."; return; }
+
+    // Chỉ gửi URL ảnh lên DB (không gửi base64)
+    const imgVal = pendingImg && !pendingImg.startsWith('data:') ? pendingImg : '';
+
+    if(usingAPI){
+      saveBtn.disabled = true;
+      msg.textContent = "Đang lưu…";
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ content: t, author: a, img_url: imgVal })
+        });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        const saved = await res.json();
+        serverQuotes.push({ t: saved.content, a: saved.author, img: saved.img_url || '' });
+        closeModal(); last = -1; show(saved.content, saved.author, saved.img_url);
+      } catch(e){
+        msg.textContent = "Lưu thất bại, thử lại nhé.";
+      } finally {
+        saveBtn.disabled = false;
+      }
+    } else {
+      // Chạy local (không có server) — hiển thị tạm, không lưu DB
+      closeModal(); last = -1; show(t, a, pendingImg);
+    }
+  });
+
+  updateCount();
+
+  const root = document.documentElement;
+
+  // chuyển hex -> rgb, tạo biến thể sáng/mờ
+  function hexToRgb(h){
+    h = h.replace('#',''); if(h.length===3) h = h.split('').map(c=>c+c).join('');
+    const n = parseInt(h,16); return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+  }
+  function lighten(hex, amt){
+    const c = hexToRgb(hex);
+    const f = v => Math.round(v + (255 - v) * amt);
+    return `rgb(${f(c.r)},${f(c.g)},${f(c.b)})`;
+  }
+  function darken(hex, amt){
+    const c = hexToRgb(hex);
+    const f = v => Math.round(v * (1 - amt));
+    return `rgb(${f(c.r)},${f(c.g)},${f(c.b)})`;
+  }
+
+  function highlightActive(src){
+    document.querySelectorAll('.swatch').forEach(s=>{
+      s.classList.toggle('active', src && s.dataset.src===src);
+    });
+  }
+
+  const MEDIA_KEY = 'inspire_media_v1';
+  const bgLayer = document.createElement('div');
+  bgLayer.id = 'backgroundLayer';
+  const bgVideo = document.createElement('video');
+  bgVideo.id = 'bgVideo';
+  bgVideo.autoplay = true;
+  bgVideo.muted = true;
+  bgVideo.loop = true;
+  bgVideo.playsInline = true;
+  bgLayer.appendChild(bgVideo);
+  document.body.appendChild(bgLayer);
+
+  const mediaOptions = [
+    { name:'Artwork Gemini', src:'img/img1.png', type:'image' },
+    { name:'img2', src:'img/img2.jpg', type:'image' },
+    { name:'DIY gift', src:'img/vid1.mp4', type:'video' },
+    { name:'Breakfast', src:'img/vid2.mp4', type:'video' },
+    { name:'Outfit ideas', src:'img/vid3.mp4', type:'video' },
+    { name:'Road trip', src:'img/vid4.mp4', type:'video' },
+    { name:'vid5', src:'img/vid5.mp4', type:'video' }
+  ];
+
+  const swatchWrap = document.getElementById('swatches');
+  mediaOptions.forEach(opt=>{
+    const s = document.createElement('button');
+    s.type = 'button';
+    s.className = 'swatch';
+    s.dataset.src = opt.src;
+    s.dataset.type = opt.type;
+    if(opt.type === 'image'){
+      s.style.backgroundImage = `url("${opt.src}")`;
+      s.style.backgroundSize = 'cover';
+      s.style.backgroundPosition = 'center';
+    } else {
+      s.classList.add('video');
+      s.style.background = 'linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.55))';
+      // lấy frame đầu của video làm thumbnail
+      const tmpVid = document.createElement('video');
+      tmpVid.muted = true;
+      tmpVid.playsInline = true;
+      tmpVid.crossOrigin = 'anonymous';
+      tmpVid.preload = 'metadata';
+      function grabFrame(){
+        const cvs = document.createElement('canvas');
+        cvs.width = tmpVid.videoWidth || 320;
+        cvs.height = tmpVid.videoHeight || 180;
+        cvs.getContext('2d').drawImage(tmpVid, 0, 0, cvs.width, cvs.height);
+        const url = cvs.toDataURL('image/jpeg', 0.75);
+        s.style.backgroundImage = `url("${url}")`;
+        s.style.backgroundSize = 'cover';
+        s.style.backgroundPosition = 'center';
+        tmpVid.src = '';
+      }
+      tmpVid.addEventListener('seeked', grabFrame, {once:true});
+      tmpVid.addEventListener('loadedmetadata', ()=>{ tmpVid.currentTime = 0.5; }, {once:true});
+      tmpVid.addEventListener('loadeddata', ()=>{ if(tmpVid.readyState >= 2) grabFrame(); }, {once:true});
+      tmpVid.src = opt.src;
+      tmpVid.load();
+    }
+    const label = document.createElement('span');
+    label.textContent = opt.name;
+    s.appendChild(label);
+    s.addEventListener('click', ()=>{
+      applyMedia(opt.src, opt.type);
+      saveMedia(opt.src, opt.type);
+    });
+    swatchWrap.appendChild(s);
+  });
+
+  function applyDefaultBackground(){
+    bgLayer.style.background = '';
+    bgVideo.style.display = 'none';
+    bgVideo.pause();
+    bgVideo.removeAttribute('src');
+    highlightActive('');
+  }
+
+  function applyMedia(src, type){
+    if(type === 'image'){
+      bgVideo.style.display = 'none';
+      bgVideo.pause();
+      bgVideo.removeAttribute('src');
+      bgLayer.style.background = `linear-gradient(160deg, rgba(26,20,16,.7), rgba(43,31,23,.35)), url("${src}") center/cover no-repeat`;
+    } else {
+      bgLayer.style.background = 'linear-gradient(160deg, rgba(26,20,16,.55), rgba(43,31,23,.3))';
+      bgVideo.src = src;
+      bgVideo.style.display = 'block';
+      bgVideo.load();
+      bgVideo.play().catch(()=>{});
+    }
+    highlightActive(src);
+  }
+
+  function saveMedia(src, type){
+    try { localStorage.setItem(MEDIA_KEY, JSON.stringify({src, type})); } catch(e){}
+  }
+
+  const themeToggle = document.getElementById('themeToggle');
+  const themePanel = document.getElementById('themePanel');
+  themeToggle.addEventListener('click', e=>{ e.stopPropagation(); themePanel.classList.toggle('open'); });
+  document.addEventListener('click', e=>{
+    if(!themePanel.contains(e.target) && e.target!==themeToggle) themePanel.classList.remove('open');
+  });
+
+  document.getElementById('themeReset').addEventListener('click', ()=>{
+    applyDefaultBackground();
+    try { localStorage.removeItem(MEDIA_KEY); } catch(e){}
+  });
+
+  (function loadTheme(){
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(MEDIA_KEY)); } catch(e){}
+    if(saved && saved.src && saved.type) {
+      applyMedia(saved.src, saved.type);
+    } else {
+      const defaultMedia = mediaOptions[2];
+      applyMedia(defaultMedia.src, defaultMedia.type);
+    }
+  })();
+
+  // ── Particles ──────────────────────────────────────────────
+  (function initParticles(){
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+    function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    const COUNT = 55;
+    function rand(a,b){ return a + Math.random()*(b-a); }
+    for(let i=0;i<COUNT;i++) particles.push({
+      x: rand(0,1), y: rand(0,1),
+      r: rand(.6,2.4), speed: rand(.00008,.00022),
+      angle: rand(0, Math.PI*2), drift: rand(-.0004,.0004),
+      opacity: rand(.12,.5), opDir: rand(-.002,.002)
+    });
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for(const p of particles){
+        p.angle += p.drift;
+        p.x += Math.cos(p.angle)*p.speed;
+        p.y -= p.speed*.7;
+        if(p.y < -0.02) p.y = 1.02;
+        if(p.x < -0.02) p.x = 1.02;
+        if(p.x > 1.02) p.x = -0.02;
+        p.opacity += p.opDir;
+        if(p.opacity>0.5||p.opacity<0.08) p.opDir *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x*W, p.y*H, p.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(130,196,248,${p.opacity})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── Cursor trail ───────────────────────────────────────────
+  (function initTrail(){
+    const DOTS = 10;
+    const dots = Array.from({length:DOTS}, ()=>{
+      const d = document.createElement('div');
+      d.className = 'trail-dot';
+      document.body.appendChild(d);
+      return d;
+    });
+    let positions = Array.from({length:DOTS}, ()=>({x:0,y:0}));
+    let mouse = {x:0,y:0};
+    document.addEventListener('mousemove', e=>{ mouse.x = e.clientX; mouse.y = e.clientY; });
+    function tick(){
+      positions.unshift({x:mouse.x, y:mouse.y});
+      positions = positions.slice(0, DOTS);
+      dots.forEach((d,i)=>{
+        const p = positions[i] || positions[positions.length-1];
+        d.style.left = p.x+'px';
+        d.style.top  = p.y+'px';
+        const scale = 1 - i/DOTS;
+        d.style.opacity = scale * 0.55;
+        d.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        d.style.width = d.style.height = (6*scale+1)+'px';
+      });
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+
+  // ── Ripple on buttons ──────────────────────────────────────
+  document.querySelectorAll('.btn').forEach(b=>{
+    b.addEventListener('click', e=>{
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = b.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.width = r.style.height = size+'px';
+      r.style.left = (e.clientX - rect.left - size/2)+'px';
+      r.style.top  = (e.clientY - rect.top  - size/2)+'px';
+      b.appendChild(r);
+      r.addEventListener('animationend', ()=>r.remove());
+    });
+  });
+
+  // ── Ambient glow flash ─────────────────────────────────────
+  const ambientGlow = document.getElementById('ambientGlow');
+  function flashGlow(){
+    ambientGlow.classList.remove('flash');
+    void ambientGlow.offsetWidth;
+    ambientGlow.classList.add('flash');
+  }
+
+  // ── Typewriter effect ──────────────────────────────────────
+  let twTimer = null;
+  function typewrite(el, text, done){
+    el.textContent = '';
+    el.classList.add('typing');
+    let i = 0;
+    clearInterval(twTimer);
+    twTimer = setInterval(()=>{
+      el.textContent += text[i++];
+      if(i >= text.length){ clearInterval(twTimer); el.classList.remove('typing'); done && done(); }
+    }, Math.max(18, Math.min(38, 2200/text.length)));
+  }
+
+  // ── Patch show() to use typewriter + glow ─────────────────
+  const _show = show;
+  show = function(t, a, img){
+    quoteEl.classList.add('fade-out'); authorEl.classList.add('fade-out');
+    quoteImg.classList.remove('show');
+    setTimeout(()=>{
+      quoteEl.classList.remove('fade-out'); authorEl.classList.remove('fade-out');
+      authorEl.textContent = a || "Khuyết danh"; authorEl.classList.add('show');
+      if(img){ quoteImg.src = img; quoteImg.classList.add('show'); } else { quoteImg.src = ''; }
+      flashGlow();
+      typewrite(quoteEl, t);
+    }, 300);
+  };
+
+  // tải câu từ API (hoặc fallback baseQuotes) rồi hiện câu đầu tiên
+  loadQuotesFromAPI();
+</script>
+</body>
+</html>
