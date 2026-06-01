@@ -690,6 +690,7 @@
   document.body.appendChild(bgLayer);
 
   const mediaOptions = [
+    { name:'Anh đỏ', src:'img/anh-do 1.jpg', type:'image' },
     { name:'Artwork Gemini', src:'img/img1.png', type:'image' },
     { name:'img2', src:'img/img2.jpg', type:'image' },
     { name:'DIY gift', src:'img/vid1.mp4', type:'video' },
@@ -792,7 +793,7 @@
     if(saved && saved.src && saved.type) {
       applyMedia(saved.src, saved.type);
     } else {
-      const defaultMedia = mediaOptions[2];
+      const defaultMedia = mediaOptions[0];
       applyMedia(defaultMedia.src, defaultMedia.type);
     }
   })();
