@@ -38,21 +38,6 @@
   }
   .quote-img.show{display:block;animation:imgIn .5s cubic-bezier(.2,.7,.2,1) both}
   @keyframes imgIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-  .img-preview{
-    max-width:100%;max-height:140px;border-radius:10px;margin-top:6px;display:none;
-    border:1px solid var(--border);
-  }
-  .img-preview.show{display:block}
-  .file-hint{font-size:.72rem;color:var(--muted);margin-top:4px;opacity:.8}
-  .img-tabs{display:flex;gap:6px;margin-bottom:8px}
-  .img-tab{
-    flex:1;font-size:.78rem;padding:7px 10px;border-radius:8px;cursor:pointer;
-    background:transparent;border:1px solid var(--border);color:var(--muted);
-    font-family:inherit;transition:all .15s;
-  }
-  .img-tab.active{background:var(--card);color:var(--accent-soft);border-color:var(--accent)}
-  .clear-img{font-size:.72rem;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;margin-top:6px;padding:0}
-  .clear-img:hover{color:var(--accent-soft)}
   .mark{font-family:"Fraunces",serif;font-size:5rem;line-height:.5;color:var(--accent);opacity:.25;margin-bottom:6px;height:34px}
   .quote{font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.9rem,5.5vw,2.8rem);line-height:1.4;letter-spacing:-.01em;transition:opacity .45s ease, transform .45s ease}
   .author{margin-top:18px;font-size:.9rem;color:var(--muted);font-style:italic;transition:opacity .45s ease, transform .45s ease}
@@ -191,22 +176,6 @@
       <div class="field">
         <label for="newAuthor">Tác giả (không bắt buộc)</label>
         <input id="newAuthor" type="text" placeholder="1 nhà hiền triết trong Ethan Ecom">
-      </div>
-      <div class="field">
-        <label>Hình ảnh (không bắt buộc)</label>
-        <div class="img-tabs">
-          <button type="button" class="img-tab active" data-tab="url">Dán link ảnh</button>
-          <button type="button" class="img-tab" data-tab="file">Tải file</button>
-        </div>
-        <div id="tabUrl">
-          <input id="newImgUrl" type="text" placeholder="">
-        </div>
-        <div id="tabFile" style="display:none">
-          <input id="newImgFile" type="file" accept="image/*">
-          <div class="file-hint">Lưu trong trình duyệt, giới hạn ~5MB tổng.</div>
-        </div>
-        <img class="img-preview" id="imgPreview" alt="">
-        <button type="button" class="clear-img" id="clearImg" style="display:none">Xóa ảnh</button>
       </div>
       <div class="msg" id="msg"></div>
       <div class="modal-actions">
@@ -557,62 +526,13 @@
   const saveBtn = document.getElementById('saveBtn');
   const newText = document.getElementById('newText');
   const newAuthor = document.getElementById('newAuthor');
-  const newImgUrl = document.getElementById('newImgUrl');
-  const newImgFile = document.getElementById('newImgFile');
-  const imgPreview = document.getElementById('imgPreview');
-  const clearImgBtn = document.getElementById('clearImg');
   const msg = document.getElementById('msg');
-  let pendingImg = ""; // base64 hoặc URL
-
-  // chuyển tab dán link / tải file
-  document.querySelectorAll('.img-tab').forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      document.querySelectorAll('.img-tab').forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      const which = tab.dataset.tab;
-      document.getElementById('tabUrl').style.display  = which==='url' ? '' : 'none';
-      document.getElementById('tabFile').style.display = which==='file' ? '' : 'none';
-    });
-  });
-
-  function setPreview(src){
-    if(src){
-      imgPreview.src = src; imgPreview.classList.add('show');
-      clearImgBtn.style.display = 'inline-block';
-      pendingImg = src;
-    } else {
-      imgPreview.src = ""; imgPreview.classList.remove('show');
-      clearImgBtn.style.display = 'none';
-      pendingImg = "";
-    }
-  }
-
-  newImgUrl.addEventListener('input', ()=>{
-    const v = newImgUrl.value.trim();
-    if(v) setPreview(v); else setPreview("");
-  });
-
-  newImgFile.addEventListener('change', ()=>{
-    const f = newImgFile.files[0];
-    if(!f) return;
-    if(f.size > 2*1024*1024){
-      msg.textContent = "Ảnh > 2MB có thể không lưu được. Nên dùng ảnh nhỏ hoặc dán link.";
-    }
-    const reader = new FileReader();
-    reader.onload = e => setPreview(e.target.result);
-    reader.readAsDataURL(f);
-  });
-
-  clearImgBtn.addEventListener('click', ()=>{
-    setPreview("");
-    newImgUrl.value = ""; newImgFile.value = "";
-  });
+  let pendingImg = "";
 
   function openModal(){ overlay.classList.add('open'); msg.textContent=""; newText.focus(); }
   function closeModal(){
     overlay.classList.remove('open');
-    newText.value=""; newAuthor.value=""; newImgUrl.value=""; newImgFile.value="";
-    setPreview("");
+    newText.value=""; newAuthor.value=""; pendingImg="";
   }
   addBtn.addEventListener('click', openModal);
   cancelBtn.addEventListener('click', closeModal);
@@ -623,8 +543,7 @@
     const a = newAuthor.value.trim() || "Khuyết danh";
     if(t.length < 3){ msg.textContent = "Câu hơi ngắn, viết thêm chút nhé."; return; }
 
-    // Chỉ gửi URL ảnh lên DB (không gửi base64)
-    const imgVal = pendingImg && !pendingImg.startsWith('data:') ? pendingImg : '';
+    const imgVal = '';
 
     if(usingAPI){
       saveBtn.disabled = true;
